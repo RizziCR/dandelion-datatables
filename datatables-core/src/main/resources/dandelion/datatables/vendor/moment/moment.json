@@ -1,0 +1,13 @@
+{
+    "bundle" : "moment",
+    "assets": [
+		{
+		    "name": "moment",
+		    "version": "2.10.3",
+		    "type": "js",
+		    "locations": {
+		        "remote": "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.js"
+		    }
+		}
+    ]
+}

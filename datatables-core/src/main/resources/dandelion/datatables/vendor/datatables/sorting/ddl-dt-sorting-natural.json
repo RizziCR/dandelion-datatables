@@ -1,0 +1,12 @@
+{
+    "dependencies": [ "datatables" ],
+    "assets": [
+        {
+            "version" : "1.10.7",
+            "locations": {
+                "jar": "dandelion/datatables/features/sorting/natural.js",
+                "remote" : "//cdn.datatables.net/plug-ins/1.10.7/sorting/natural.js"
+            }
+        }
+    ]
+}

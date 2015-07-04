@@ -40,65 +40,65 @@ import com.github.dandelion.datatables.core.generator.DTConstants;
  */
 public enum CallbackType {
 
-	CREATEDROW(DTConstants.DT_FN_CREATED_ROW, false, "nRow", "aData", "iDataIndex"),
+   CREATEDROW(DTConstants.DT_FN_CREATED_ROW, false, "row", "data", "dataIndex"),
 
-	DRAW(DTConstants.DT_FN_DRAW_CBK, false, "oSettings"),
+   DRAW(DTConstants.DT_FN_DRAW_CBK, false, "settings"),
 
-	FOOTER(DTConstants.DT_FN_FOOTER_CBK, false, "nFoot", "aData", "iStart", "iEnd", "aiDisplay"),
+   FOOTER(DTConstants.DT_FN_FOOTER_CBK, false, "tfoot", "data", "start", "end", "display"),
 
-	FORMAT(DTConstants.DT_FN_FORMAT_NUMBER, true, "iIn"),
+   FORMAT(DTConstants.DT_FN_FORMAT_NUMBER, true, "toFormat"),
 
-	HEADER(DTConstants.DT_FN_HEADER_CBK, false, "nHead", "aData", "iStart", "iEnd", "aiDisplay"),
+   HEADER(DTConstants.DT_FN_HEADER_CBK, false, "tead", "data", "start", "end", "display"),
 
-	INFO(DTConstants.DT_FN_INFO_CBK, true, "oSettings", "iStart", "iEnd", "iMax", "iTotal", "sPre"),
+   INFO(DTConstants.DT_FN_INFO_CBK, true, "settings", "start", "end", "max", "total", "pre"),
 
-	INIT(DTConstants.DT_FN_INIT_COMPLETE, false, "oSettings", "json"),
+   INIT(DTConstants.DT_FN_INIT_COMPLETE, false, "settings", "json"),
 
-	PREDRAW(DTConstants.DT_FN_PRE_DRAW_CBK, true, "oSettings"),
+   PREDRAW(DTConstants.DT_FN_PRE_DRAW_CBK, true, "settings"),
 
-	ROW(DTConstants.DT_FN_ROW_CBK, false, "nRow", "aData", "iDisplayIndex", "iDisplayIndexFull"),
+   ROW(DTConstants.DT_FN_ROW_CBK, false, "nrow", "data", "index"),
 
-   STATESAVE(DTConstants.DT_FN_STATESAVE_CBK, false, "oSettings", "oData"),
+   STATESAVE(DTConstants.DT_FN_STATESAVE_CBK, false, "settings", "data"),
 
-   STATESAVEPARAMS(DTConstants.DT_FN_STATESAVE_PARAMS_CBK, true, "oSettings"),
+   STATESAVEPARAMS(DTConstants.DT_FN_STATESAVE_PARAMS_CBK, true, "settings", "data"),
 
-   STATELOAD(DTConstants.DT_FN_STATELOAD_CBK, false, "oSettings", "oData"),
+   STATELOAD(DTConstants.DT_FN_STATELOAD_CBK, false, "settings"),
 
-   STATELOADPARAMS(DTConstants.DT_FN_STATELOAD_PARAMS_CBK, true, "oSettings"),
+   STATELOADPARAMS(DTConstants.DT_FN_STATELOAD_PARAMS_CBK, true, "settings", "data"),
 
-   STATELOADED(DTConstants.DT_FN_STATELOADED_CBK, false, "oSettings", "oData");
+   STATELOADED(DTConstants.DT_FN_STATELOADED_CBK, false, "settings", "data");
 
-	private String name;
-	private boolean hasReturn;
-	private String[] args;
+   private String name;
+   private boolean hasReturn;
+   private String[] args;
 
-	private CallbackType(String function, boolean hasReturn, String... args){
-		this.name = function;
-		this.setHasReturn(hasReturn);
-		this.args = args;
-	}
+   private CallbackType(String function, boolean hasReturn, String... args) {
+      this.name = function;
+      this.setHasReturn(hasReturn);
+      this.args = args;
+   }
 
-	public String getName() {
-		return name;
-	}
+   public String getName() {
+      return name;
+   }
 
-	public void setFunction(String function) {
-		this.name = function;
-	}
+   public void setFunction(String function) {
+      this.name = function;
+   }
 
-	public String[] getArgs() {
-		return args;
-	}
+   public String[] getArgs() {
+      return args;
+   }
 
-	public void setArgs(String[] args) {
-		this.args = args;
-	}
+   public void setArgs(String[] args) {
+      this.args = args;
+   }
 
-	public boolean hasReturn() {
-		return hasReturn;
-	}
+   public boolean hasReturn() {
+      return hasReturn;
+   }
 
-	public void setHasReturn(boolean hasReturn) {
-		this.hasReturn = hasReturn;
-	}
+   public void setHasReturn(boolean hasReturn) {
+      this.hasReturn = hasReturn;
+   }
 }

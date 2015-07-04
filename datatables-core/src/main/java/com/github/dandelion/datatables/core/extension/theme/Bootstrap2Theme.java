@@ -29,7 +29,6 @@
  */
 package com.github.dandelion.datatables.core.extension.theme;
 
-import com.github.dandelion.core.DandelionException;
 import com.github.dandelion.core.asset.generator.js.JsSnippet;
 import com.github.dandelion.datatables.core.DatatableBundles;
 import com.github.dandelion.datatables.core.extension.AbstractExtension;
@@ -50,39 +49,24 @@ import com.github.dandelion.datatables.core.option.DatatableOptions;
  */
 public class Bootstrap2Theme extends AbstractExtension {
 
-	@Override
-	public String getExtensionName() {
-		return "bootstrap2";
-	}
+   @Override
+   public String getExtensionName() {
+      return "bootstrap2";
+   }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setup(HtmlTable table) {
+   @Override
+   public void setup(HtmlTable table) {
 
-		addBundle(DatatableBundles.DDL_DT_THEME_BOOTSTRAP2);
+      addBundle(DatatableBundles.DDL_DT_THEME_BOOTSTRAP2);
 
-		Boolean paging = DatatableOptions.FEATURE_PAGEABLE.valueFrom(table.getTableConfiguration());
-		if (paging != null && paging == true) {
-			addBundle(DatatableBundles.DDL_DT_PAGING_BOOTSTRAP_SIMPLE);
-			if (DatatableOptions.FEATURE_PAGINGTYPE.valueFrom(table.getTableConfiguration()) == null) {
-				addParameter(DTConstants.DT_PAGINGTYPE, PagingType.BOOTSTRAP_SIMPLE.toString());
-			}
-		}
+      Boolean paging = DatatableOptions.FEATURE_PAGEABLE.valueFrom(table.getTableConfiguration());
+      if (paging != null && paging == true) {
+         addBundle(DatatableBundles.DDL_DT_PAGING_BOOTSTRAP_SIMPLE);
+         if (DatatableOptions.FEATURE_PAGINGTYPE.valueFrom(table.getTableConfiguration()) == null) {
+            addParameter(DTConstants.DT_PAGINGTYPE, PagingType.BOOTSTRAP_SIMPLE.toString());
+         }
+      }
 
-		ThemeOption themeOption = DatatableOptions.CSS_THEMEOPTION.valueFrom(table.getTableConfiguration());
-
-		if (themeOption != null) {
-			if (themeOption.equals(ThemeOption.TABLECLOTH)) {
-				addBundle(DatatableBundles.DDL_DT_THEME_BOOTSTRAP2_TABLECLOTH);
-			}
-			else {
-				throw new DandelionException(
-						"Only the 'tablecloth' theme option is compatible with the 'bootstrap2' theme");
-			}
-		}
-
-		addParameter(DTConstants.DT_AS_STRIPE_CLASSES, new JsSnippet("[]"));
-	}
+      addParameter(DTConstants.DT_AS_STRIPE_CLASSES, new JsSnippet("[]"));
+   }
 }

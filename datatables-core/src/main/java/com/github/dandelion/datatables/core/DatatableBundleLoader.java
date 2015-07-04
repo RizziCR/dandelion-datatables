@@ -1,6 +1,6 @@
 /*
  * [The "BSD licence"]
- * Copyright (c) 2013-2014 Dandelion
+ * Copyright (c) 2013-2015 Dandelion
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,11 @@
  */
 package com.github.dandelion.datatables.core;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.dandelion.core.Context;
 import com.github.dandelion.core.bundle.loader.AbstractBundleLoader;
-import com.github.dandelion.core.storage.BundleStorageUnit;
 
 /**
  * <p>
@@ -48,28 +46,27 @@ import com.github.dandelion.core.storage.BundleStorageUnit;
  */
 public class DatatableBundleLoader extends AbstractBundleLoader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DatatableBundleLoader.class);
+   private static final Logger LOG = LoggerFactory.getLogger(DatatableBundleLoader.class);
 
-	public static final String LOADER_NAME = "dandelion-datatables";
-	public static final String SCANNING_PATH = "dandelion/datatables";
+   public static final String LOADER_NAME = "dandelion-datatables";
+   public static final String SCANNING_PATH = "dandelion/datatables";
 
-	@Override
-	protected Logger getLogger() {
-		return LOG;
-	}
+   public DatatableBundleLoader(Context context, boolean isStandalone) {
+      super(context, isStandalone);
+   }
 
-	@Override
-	public String getName() {
-		return LOADER_NAME;
-	}
+   @Override
+   public String getName() {
+      return LOADER_NAME;
+   }
 
-	@Override
-	public String getPath() {
-		return SCANNING_PATH;
-	}
+   @Override
+   protected Logger getLogger() {
+      return LOG;
+   }
 
-	@Override
-	protected void doCustomBundlePostProcessing(List<BundleStorageUnit> bundles) {
-		// Nothing to do
-	}
+   @Override
+   public String getScanningPath() {
+      return SCANNING_PATH;
+   }
 }

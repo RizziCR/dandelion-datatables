@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import com.github.dandelion.core.DandelionException;
 import com.github.dandelion.core.asset.generator.js.JsSnippet;
 import com.github.dandelion.core.web.AssetRequestContext;
 import com.github.dandelion.datatables.core.extension.AbstractExtensionTest;
@@ -26,22 +25,6 @@ public class Bootstrap2ThemeTest extends AbstractExtensionTest {
 		assertThat(mainConfig).hasSize(1);
 		assertThat(mainConfig).contains(
 				entry(DTConstants.DT_AS_STRIPE_CLASSES, new JsSnippet("[]")));
-	}
-
-	@Test
-	public void shoud_load_the_extension_with_tablecloth() {
-		DatatableOptions.CSS_THEMEOPTION.setIn(table.getTableConfiguration(), ThemeOption.TABLECLOTH);
-		extensionProcessor.process(new HashSet<Extension>(Arrays.asList(new Bootstrap2Theme())));
-
-		assertThat(AssetRequestContext.get(table.getTableConfiguration().getRequest()).getBundles(true)).hasSize(2);
-		assertThat(mainConfig).hasSize(1);
-		assertThat(mainConfig).contains(entry(DTConstants.DT_AS_STRIPE_CLASSES, new JsSnippet("[]")));
-	}
-
-	@Test(expected = DandelionException.class)
-	public void shoud_not_load_the_extension_with_wrong_option() {
-		DatatableOptions.CSS_THEMEOPTION.setIn(table.getTableConfiguration(), ThemeOption.CUPERTINO);
-		extensionProcessor.process(new HashSet<Extension>(Arrays.asList(new Bootstrap2Theme())));
 	}
 
 	@Test

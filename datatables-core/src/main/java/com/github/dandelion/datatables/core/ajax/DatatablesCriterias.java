@@ -59,192 +59,221 @@ import com.github.dandelion.datatables.core.generator.DTConstants;
  */
 public class DatatablesCriterias implements Serializable {
 
-	private static final long serialVersionUID = 8661357461501153387L;
+   private static final long serialVersionUID = 8661357461501153387L;
 
-	private static final Logger LOG = LoggerFactory.getLogger(DatatablesCriterias.class);
+   private static final Logger LOG = LoggerFactory.getLogger(DatatablesCriterias.class);
 
-	private static Pattern pattern = Pattern.compile("columns\\[([0-9]*)?\\]");
-	private final String search;
-	private final Integer start;
-	private final Integer length;
-	private final List<ColumnDef> columnDefs;
-	private final List<ColumnDef> sortingColumnDefs;
-	private final Integer draw;
+   private static Pattern pattern = Pattern.compile("columns\\[([0-9]*)?\\]");
+   private final String search;
+   private final Integer start;
+   private final Integer length;
+   private final List<ColumnDef> columnDefs;
+   private final List<ColumnDef> sortedColumnDefs;
+   private final Integer draw;
 
-	private DatatablesCriterias(String search, Integer displayStart, Integer displaySize, List<ColumnDef> columnDefs,
-			List<ColumnDef> sortingColumnDefs, Integer draw) {
-		this.search = search;
-		this.start = displayStart;
-		this.length = displaySize;
-		this.columnDefs = columnDefs;
-		this.sortingColumnDefs = sortingColumnDefs;
-		this.draw = draw;
-	}
+   private DatatablesCriterias(String search, Integer displayStart, Integer displaySize, List<ColumnDef> columnDefs,
+         List<ColumnDef> sortedColumnDefs, Integer draw) {
+      this.search = search;
+      this.start = displayStart;
+      this.length = displaySize;
+      this.columnDefs = columnDefs;
+      this.sortedColumnDefs = sortedColumnDefs;
+      this.draw = draw;
+   }
 
-	public Integer getStart() {
-		return start;
-	}
+   public Integer getStart() {
+      return start;
+   }
 
-	public Integer getLength() {
-		return length;
-	}
+   public Integer getLength() {
+      return length;
+   }
 
-	public String getSearch() {
-		return search;
-	}
+   public String getSearch() {
+      return search;
+   }
 
-	public Integer getDraw() {
-		return draw;
-	}
+   public Integer getDraw() {
+      return draw;
+   }
 
-	public List<ColumnDef> getColumnDefs() {
-		return columnDefs;
-	}
+   public List<ColumnDef> getColumnDefs() {
+      return columnDefs;
+   }
 
-	public List<ColumnDef> getSortingColumnDefs() {
-		return sortingColumnDefs;
-	}
+   /**
+    * @return all sorted columns.
+    * @deprecated Use {@link #getSortedColumnDefs()} instead.
+    */
+   public List<ColumnDef> getSortingColumnDefs() {
+      return sortedColumnDefs;
+   }
 
-	/**
-	 * @return true if a column is filterable, false otherwise.
-	 */
-	public Boolean hasOneFilterableColumn() {
-		for (ColumnDef columnDef : this.columnDefs) {
-			if (columnDef.isFilterable()) {
-				return true;
-			}
-		}
-		return false;
-	}
+   /**
+    * @return all sorted columns.
+    */
+   public List<ColumnDef> getSortedColumnDefs() {
+      return sortedColumnDefs;
+   }
 
-	/**
-	 * @return true if a column is being filtered, false otherwise.
-	 */
-	public Boolean hasOneFilteredColumn() {
-		for (ColumnDef columnDef : this.columnDefs) {
-			if (StringUtils.isNotBlank(columnDef.getSearch()) || StringUtils.isNotBlank(columnDef.getSearchFrom())
-					|| StringUtils.isNotBlank(columnDef.getSearchTo())) {
-				return true;
-			}
-		}
-		return false;
-	}
+   /**
+    * @return {@code true} if one the columns is searchable, {@code false}
+    *         otherwise.
+    * @deprecated Use {@link #hasOneSearchableColumn()} instead.
+    */
+   public Boolean hasOneFilterableColumn() {
+      return hasOneSearchableColumn();
+   }
 
-	/**
-	 * @return true if a column is being sorted, false otherwise.
-	 */
-	public Boolean hasOneSortedColumn() {
-		return !sortingColumnDefs.isEmpty();
-	}
+   /**
+    * @return {@code true} if one the columns is searchable, {@code false}
+    *         otherwise.
+    */
+   public Boolean hasOneSearchableColumn() {
+      for (ColumnDef columnDef : this.columnDefs) {
+         if (columnDef.isSearchable()) {
+            return true;
+         }
+      }
+      return false;
+   }
 
-	/**
-	 * <p>
-	 * Map all request parameters into a wrapper POJO that eases SQL querying.
-	 * </p>
-	 * 
-	 * @param request
-	 *            The request sent by Datatables containing all parameters.
-	 * @return a wrapper POJO.
-	 */
-	public static DatatablesCriterias getFromRequest(HttpServletRequest request) {
+   /**
+    * @return true if a column is being filtered, false otherwise.
+    */
+   public Boolean hasOneFilteredColumn() {
+      for (ColumnDef columnDef : this.columnDefs) {
+         if (StringUtils.isNotBlank(columnDef.getSearch()) || StringUtils.isNotBlank(columnDef.getSearchFrom())
+               || StringUtils.isNotBlank(columnDef.getSearchTo())) {
+            return true;
+         }
+      }
+      return false;
+   }
 
-		Validate.notNull(request, "The HTTP request cannot be null");
+   /**
+    * @return true if a column is being sorted, false otherwise.
+    */
+   public Boolean hasOneSortedColumn() {
+      return !sortedColumnDefs.isEmpty();
+   }
 
-		int columnNumber = getColumnNumber(request);
-		LOG.trace("Number of columns: {}", columnNumber);
+   /**
+    * <p>
+    * Map all request parameters into a wrapper POJO that eases SQL querying.
+    * </p>
+    * 
+    * @param request
+    *           The request sent by Datatables containing all parameters.
+    * @return a wrapper POJO.
+    */
+   public static DatatablesCriterias getFromRequest(HttpServletRequest request) {
 
-		String paramSearch = request.getParameter(DTConstants.DT_S_SEARCH);
-		String paramDraw = request.getParameter(DTConstants.DT_I_DRAW);
-		String paramStart = request.getParameter(DTConstants.DT_I_START);
-		String paramLength = request.getParameter(DTConstants.DT_I_LENGTH);
+      Validate.notNull(request, "The HTTP request cannot be null");
 
-		Integer draw = StringUtils.isNotBlank(paramDraw) ? Integer.parseInt(paramDraw) : -1;
-		Integer start = StringUtils.isNotBlank(paramStart) ? Integer.parseInt(paramStart) : -1;
-		Integer length = StringUtils.isNotBlank(paramLength) ? Integer.parseInt(paramLength) : -1;
+      int columnNumber = getColumnNumber(request);
+      LOG.trace("Number of columns: {}", columnNumber);
 
-		// Column definitions
-		List<ColumnDef> columnDefs = new ArrayList<ColumnDef>();
+      String paramSearch = request.getParameter(DTConstants.DT_S_SEARCH);
+      String paramDraw = request.getParameter(DTConstants.DT_I_DRAW);
+      String paramStart = request.getParameter(DTConstants.DT_I_START);
+      String paramLength = request.getParameter(DTConstants.DT_I_LENGTH);
 
-		for (int i = 0; i < columnNumber; i++) {
+      Integer draw = StringUtils.isNotBlank(paramDraw) ? Integer.parseInt(paramDraw) : -1;
+      Integer start = StringUtils.isNotBlank(paramStart) ? Integer.parseInt(paramStart) : -1;
+      Integer length = StringUtils.isNotBlank(paramLength) ? Integer.parseInt(paramLength) : -1;
 
-			ColumnDef columnDef = new ColumnDef();
+      // Column definitions
+      List<ColumnDef> columnDefs = new ArrayList<ColumnDef>();
 
-			columnDef.setName(request.getParameter("columns[" + i + "][data]"));
-			columnDef.setFilterable(Boolean.parseBoolean(request.getParameter("columns[" + i + "][searchable]")));
-			columnDef.setSortable(Boolean.parseBoolean(request.getParameter("columns[" + i + "][orderable]")));
-			columnDef.setRegex(request.getParameter("columns[" + i + "][search][regex]"));
-			
-			String searchTerm = request.getParameter("columns[" + i + "][search][value]");
+      for (int i = 0; i < columnNumber; i++) {
 
-			if (StringUtils.isNotBlank(searchTerm)) {
-				columnDef.setFiltered(true);
-				String[] splittedSearch = searchTerm.split("~");
-				if ("~".equals(searchTerm)) {
-					columnDef.setSearch("");
-				}
-				else if (searchTerm.startsWith("~")) {
-					columnDef.setSearchTo(splittedSearch[1]);
-				}
-				else if (searchTerm.endsWith("~")) {
-					columnDef.setSearchFrom(splittedSearch[0]);
-				}
-				else if (searchTerm.contains("~")) {
-					columnDef.setSearchFrom(splittedSearch[0]);
-					columnDef.setSearchTo(splittedSearch[1]);
-				}
-				else {
-					columnDef.setSearch(searchTerm);
-				}
-			}
+         ColumnDef columnDef = new ColumnDef();
 
-			columnDefs.add(columnDef);
-		}
+         columnDef.setName(request.getParameter("columns[" + i + "][data]"));
+         columnDef.setSearchable(Boolean.parseBoolean(request.getParameter("columns[" + i + "][searchable]")));
+         columnDef.setSortable(Boolean.parseBoolean(request.getParameter("columns[" + i + "][orderable]")));
+         columnDef.setRegex(request.getParameter("columns[" + i + "][search][regex]"));
 
-		// Sorted column definitions
-		List<ColumnDef> sortingColumnDefs = new LinkedList<ColumnDef>();
+         String searchTerm = request.getParameter("columns[" + i + "][search][value]");
 
-		for (int i = 0; i < columnNumber; i++) {
-			String paramSortedCol = request.getParameter("order[" + i + "][column]");
+         if (StringUtils.isNotBlank(searchTerm)) {
+            columnDef.setFiltered(true);
+            String[] splittedSearch = searchTerm.split("~");
+            if ("~".equals(searchTerm)) {
+               columnDef.setSearch("");
+            }
+            else if (searchTerm.startsWith("~")) {
+               columnDef.setSearchTo(splittedSearch[1]);
+            }
+            else if (searchTerm.endsWith("~")) {
+               columnDef.setSearchFrom(splittedSearch[0]);
+            }
+            else if (searchTerm.contains("~")) {
+               columnDef.setSearchFrom(splittedSearch[0]);
+               columnDef.setSearchTo(splittedSearch[1]);
+            }
+            else {
+               columnDef.setSearch(searchTerm);
+            }
+         }
 
-			// The column is being sorted
-			if (StringUtils.isNotBlank(paramSortedCol)) {
-				Integer sortedCol = Integer.parseInt(paramSortedCol);
-				ColumnDef sortedColumnDef = columnDefs.get(sortedCol);
-				String sortedColDirection = request.getParameter("order[" + i + "][dir]");
-				if (StringUtils.isNotBlank(sortedColDirection)) {
-					sortedColumnDef.setSortDirection(SortDirection.valueOf(sortedColDirection.toUpperCase()));
-				}
+         for (int j = 0; j < columnNumber; j++) {
+            String ordered = request.getParameter("order[" + j + "][column]");
+            if (ordered != null && ordered.equals(String.valueOf(i))) {
+               columnDef.setSorted(true);
+               break;
+            }
+         }
 
-				sortingColumnDefs.add(sortedColumnDef);
-			}
-		}
+         columnDefs.add(columnDef);
+      }
 
-		return new DatatablesCriterias(paramSearch, start, length, columnDefs, sortingColumnDefs, draw);
-	}
+      // Sorted column definitions
+      List<ColumnDef> sortedColumnDefs = new LinkedList<ColumnDef>();
 
-	private static int getColumnNumber(HttpServletRequest request) {
+      for (int i = 0; i < columnNumber; i++) {
+         String paramSortedCol = request.getParameter("order[" + i + "][column]");
 
-		int columnNumber = 0;
-		for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
-			String param = e.nextElement();
-			Matcher matcher = pattern.matcher(param);
-			while (matcher.find()) {
-				Integer col = Integer.parseInt(matcher.group(1));
-				if (col > columnNumber) {
-					columnNumber = col;
-				}
-			}
-		}
+         // The column is being sorted
+         if (StringUtils.isNotBlank(paramSortedCol)) {
+            Integer sortedCol = Integer.parseInt(paramSortedCol);
+            ColumnDef sortedColumnDef = columnDefs.get(sortedCol);
+            String sortedColDirection = request.getParameter("order[" + i + "][dir]");
+            if (StringUtils.isNotBlank(sortedColDirection)) {
+               sortedColumnDef.setSortDirection(SortDirection.valueOf(sortedColDirection.toUpperCase()));
+            }
 
-		if (columnNumber != 0) {
-			columnNumber++;
-		}
-		return columnNumber;
-	}
+            sortedColumnDefs.add(sortedColumnDef);
+         }
+      }
 
-	@Override
-	public String toString() {
-		return "DatatablesCriterias [search=" + search + ", start=" + start + ", length=" + length + ", columnDefs="
-				+ columnDefs + ", sortingColumnDefs=" + sortingColumnDefs + ", draw=" + draw + "]";
-	}
+      return new DatatablesCriterias(paramSearch, start, length, columnDefs, sortedColumnDefs, draw);
+   }
+
+   private static int getColumnNumber(HttpServletRequest request) {
+
+      int columnNumber = 0;
+      for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+         String param = e.nextElement();
+         Matcher matcher = pattern.matcher(param);
+         while (matcher.find()) {
+            Integer col = Integer.parseInt(matcher.group(1));
+            if (col > columnNumber) {
+               columnNumber = col;
+            }
+         }
+      }
+
+      if (columnNumber != 0) {
+         columnNumber++;
+      }
+      return columnNumber;
+   }
+
+   @Override
+   public String toString() {
+      return "DatatablesCriterias [search=" + search + ", start=" + start + ", length=" + length + ", columnDefs="
+            + columnDefs + ", sortingColumnDefs=" + sortedColumnDefs + ", draw=" + draw + "]";
+   }
 }
