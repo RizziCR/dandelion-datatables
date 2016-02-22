@@ -34,19 +34,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import com.github.dandelion.core.option.BooleanProcessor;
+import com.github.dandelion.core.option.EmptyStringProcessor;
+import com.github.dandelion.core.option.IntegerProcessor;
+import com.github.dandelion.core.option.Option;
+import com.github.dandelion.core.option.StringBuilderProcessor;
+import com.github.dandelion.core.option.StringProcessor;
 import com.github.dandelion.datatables.core.export.ExportConf;
 import com.github.dandelion.datatables.core.extension.Extension;
 import com.github.dandelion.datatables.core.extension.feature.FilterPlaceholder;
 import com.github.dandelion.datatables.core.extension.feature.PagingType;
 import com.github.dandelion.datatables.core.extension.theme.ThemeOption;
 import com.github.dandelion.datatables.core.generator.YadcfConfigGenerator.FilterType;
-import com.github.dandelion.datatables.core.option.processor.BooleanProcessor;
-import com.github.dandelion.datatables.core.option.processor.EmptyStringProcessor;
-import com.github.dandelion.datatables.core.option.processor.IntegerProcessor;
-import com.github.dandelion.datatables.core.option.processor.StringBuilderProcessor;
-import com.github.dandelion.datatables.core.option.processor.StringProcessor;
+import com.github.dandelion.datatables.core.option.processor.ajax.AjaxDeferLoadingProcessor;
 import com.github.dandelion.datatables.core.option.processor.ajax.AjaxPipeliningProcessor;
 import com.github.dandelion.datatables.core.option.processor.ajax.AjaxReloadFunctionProcessor;
 import com.github.dandelion.datatables.core.option.processor.ajax.AjaxReloadSelectorProcessor;
@@ -59,9 +60,11 @@ import com.github.dandelion.datatables.core.option.processor.column.SortTypeProc
 import com.github.dandelion.datatables.core.option.processor.css.CssStripeClassesProcessor;
 import com.github.dandelion.datatables.core.option.processor.css.CssThemeOptionProcessor;
 import com.github.dandelion.datatables.core.option.processor.css.CssThemeProcessor;
+import com.github.dandelion.datatables.core.option.processor.export.ExportClassProcessor;
 import com.github.dandelion.datatables.core.option.processor.export.ExportEnabledFormatProcessor;
-import com.github.dandelion.datatables.core.option.processor.export.ExportFormatProcessor;
-import com.github.dandelion.datatables.core.option.processor.feature.FeatureAppearProcessor;
+import com.github.dandelion.datatables.core.option.processor.export.ExportFileNameProcessor;
+import com.github.dandelion.datatables.core.option.processor.export.ExportLabelProcessor;
+import com.github.dandelion.datatables.core.option.processor.export.ExportMimeTypeProcessor;
 import com.github.dandelion.datatables.core.option.processor.feature.FeatureFilterPlaceholderProcessor;
 import com.github.dandelion.datatables.core.option.processor.feature.FeatureFilterSelectorProcessor;
 import com.github.dandelion.datatables.core.option.processor.feature.FeatureLengthMenuProcessor;
@@ -116,8 +119,6 @@ public final class DatatableOptions {
          new FeatureFilterSelectorProcessor(), 100);
    public static final Option<String> FEATURE_FILTER_CLEAR_SELECTOR = new Option<String>("feature.filterClearSelector",
          new StringProcessor(), 100);
-   public static final Option<String> FEATURE_FILTER_TRIGGER = new Option<String>("feature.filterTrigger",
-         new StringProcessor(), 100);
    public static final Option<Boolean> FEATURE_PAGEABLE = new Option<Boolean>("feature.pageable",
          new BooleanProcessor(), 100);
    public static final Option<PagingType> FEATURE_PAGINGTYPE = new Option<PagingType>("feature.pagingType",
@@ -143,21 +144,21 @@ public final class DatatableOptions {
          100);
    public static final Option<String> FEATURE_SCROLLXINNER = new Option<String>("feature.scrollXInner",
          new StringProcessor(), 100);
-   public static final Option<String> FEATURE_APPEAR = new Option<String>("feature.appear",
-         new FeatureAppearProcessor(), 100);
-   public static final Option<String> FEATURE_APPEAR_DURATION = new Option<String>("feature.appearDuration", null, 100);
    public static final Option<Boolean> FEATURE_PROCESSING = new Option<Boolean>("feature.processing",
          new BooleanProcessor(), 100);
 
    public static final Option<Boolean> AJAX_DEFERRENDER = new Option<Boolean>("ajax.deferRender",
          new BooleanProcessor(), 100);
+   public static final Option<Object> AJAX_DEFERLOADING = new Option<Object>("ajax.deferLoading",
+         new AjaxDeferLoadingProcessor(), 100);
    public static final Option<String> AJAX_SOURCE = new Option<String>("ajax.source", new AjaxSourceProcessor(), 100);
    public static final Option<String> AJAX_PARAMS = new Option<String>("ajax.params", new StringProcessor(true), 98);
    public static final Option<Boolean> AJAX_SERVERSIDE = new Option<Boolean>("ajax.serverSide",
          new AjaxServerSideProcessor(), 99);
    public static final Option<Boolean> AJAX_PIPELINING = new Option<Boolean>("ajax.pipelining",
          new AjaxPipeliningProcessor(), 101);
-   public static final Option<Integer> AJAX_PIPESIZE = new Option<Integer>("ajax.pipeSize", new IntegerProcessor(), 100);
+   public static final Option<Integer> AJAX_PIPESIZE = new Option<Integer>("ajax.pipeSize", new IntegerProcessor(),
+         100);
    public static final Option<String> AJAX_RELOAD_SELECTOR = new Option<String>("ajax.reloadSelector",
          new AjaxReloadSelectorProcessor(), 100);
    public static final Option<String> AJAX_RELOAD_FUNCTION = new Option<String>("ajax.reloadFunction",
@@ -174,14 +175,46 @@ public final class DatatableOptions {
          new StringProcessor(), 100);
    public static final Option<String> EXPORT_CONTAINER_CLASS = new Option<String>("export.container.class",
          new StringProcessor(), 100);
-   public static final Option<String> EXPORT_CLASS = new Option<String>(ExportFormatProcessor.REGEX_EXPORT_CLASS,
-         new ExportFormatProcessor(), 100);
-   public static final Option<String> EXPORT_LABEL = new Option<String>(ExportFormatProcessor.REGEX_EXPORT_LABEL,
-         new ExportFormatProcessor(), 100);
-   public static final Option<String> EXPORT_FILENAME = new Option<String>(ExportFormatProcessor.REGEX_EXPORT_FILENAME,
-         new ExportFormatProcessor(), 100);
-   public static final Option<String> EXPORT_MIMETYPE = new Option<String>(ExportFormatProcessor.REGEX_EXPORT_MIMETYPE,
-         new ExportFormatProcessor(), 100);
+   public static final Option<String> EXPORT_CSV_CLASS = new Option<String>("export.csv.class",
+         new ExportClassProcessor(), 100);
+   public static final Option<String> EXPORT_CSV_LABEL = new Option<String>("export.csv.label",
+         new ExportLabelProcessor(), 100);
+   public static final Option<String> EXPORT_CSV_FILENAME = new Option<String>("export.csv.filename",
+         new ExportFileNameProcessor(), 100);
+   public static final Option<String> EXPORT_CSV_MIMETYPE = new Option<String>("export.csv.mimetype   ",
+         new ExportMimeTypeProcessor(), 100);
+   public static final Option<String> EXPORT_XML_CLASS = new Option<String>("export.xml.class",
+         new ExportClassProcessor(), 100);
+   public static final Option<String> EXPORT_XML_LABEL = new Option<String>("export.xml.label",
+         new ExportLabelProcessor(), 100);
+   public static final Option<String> EXPORT_XML_FILENAME = new Option<String>("export.xml.filename",
+         new ExportFileNameProcessor(), 100);
+   public static final Option<String> EXPORT_XML_MIMETYPE = new Option<String>("export.xml.mimetype   ",
+         new ExportMimeTypeProcessor(), 100);
+   public static final Option<String> EXPORT_PDF_CLASS = new Option<String>("export.pdf.class",
+         new ExportClassProcessor(), 100);
+   public static final Option<String> EXPORT_PDF_LABEL = new Option<String>("export.pdf.label",
+         new ExportLabelProcessor(), 100);
+   public static final Option<String> EXPORT_PDF_FILENAME = new Option<String>("export.pdf.filename",
+         new ExportFileNameProcessor(), 100);
+   public static final Option<String> EXPORT_PDF_MIMETYPE = new Option<String>("export.pdf.mimetype   ",
+         new ExportMimeTypeProcessor(), 100);
+   public static final Option<String> EXPORT_XLS_CLASS = new Option<String>("export.xls.class",
+         new ExportClassProcessor(), 100);
+   public static final Option<String> EXPORT_XLS_LABEL = new Option<String>("export.xls.label",
+         new ExportLabelProcessor(), 100);
+   public static final Option<String> EXPORT_XLS_FILENAME = new Option<String>("export.xls.filename",
+         new ExportFileNameProcessor(), 100);
+   public static final Option<String> EXPORT_XLS_MIMETYPE = new Option<String>("export.xls.mimetype   ",
+         new ExportMimeTypeProcessor(), 100);
+   public static final Option<String> EXPORT_XLSX_CLASS = new Option<String>("export.xlsx.class",
+         new ExportClassProcessor(), 100);
+   public static final Option<String> EXPORT_XLSX_LABEL = new Option<String>("export.xlsx.label",
+         new ExportLabelProcessor(), 100);
+   public static final Option<String> EXPORT_XLSX_FILENAME = new Option<String>("export.xlsx.filename",
+         new ExportFileNameProcessor(), 100);
+   public static final Option<String> EXPORT_XLSX_MIMETYPE = new Option<String>("export.xlsx.mimetype   ",
+         new ExportMimeTypeProcessor(), 100);
 
    public static final Option<String> I18N_MSG_PROCESSING = new Option<String>("i18n.msg.processing",
          new MessageProcessor(), 100);
@@ -226,7 +259,8 @@ public final class DatatableOptions {
    public static final Option<String> TITLEKEY = new Option<String>("titleKey", new StringProcessor(), 100);
    public static final Option<String> NAME = new Option<String>("name", new StringProcessor(), 100);
    public static final Option<String> PROPERTY = new Option<String>("property", new StringProcessor(), 100);
-   public static final Option<String> DEFAULTVALUE = new Option<String>("defaultValue", new EmptyStringProcessor(), 100);
+   public static final Option<String> DEFAULTVALUE = new Option<String>("defaultValue", new EmptyStringProcessor(),
+         100);
    public static final Option<StringBuilder> CSSSTYLE = new Option<StringBuilder>("cssStyle",
          new StringBuilderProcessor(), 100);
    public static final Option<StringBuilder> CSSCELLSTYLE = new Option<StringBuilder>("cssCellStyle",
@@ -238,9 +272,10 @@ public final class DatatableOptions {
    public static final Option<Boolean> SORTABLE = new Option<Boolean>("sortable", new BooleanProcessor(), 100);
    public static final Option<List<Direction>> SORTDIRECTION = new Option<List<Direction>>("sortDirection",
          new SortDirectionProcessor(), 100);
-   public static final Option<String> SORTINITDIRECTION = new Option<String>("sortInitDirection",
-         new StringProcessor(), 100);
-   public static final Option<Integer> SORTINITORDER = new Option<Integer>("sortInitOrder", new IntegerProcessor(), 100);
+   public static final Option<String> SORTINITDIRECTION = new Option<String>("sortInitDirection", new StringProcessor(),
+         100);
+   public static final Option<Integer> SORTINITORDER = new Option<Integer>("sortInitOrder", new IntegerProcessor(),
+         100);
    public static final Option<String> SORTTYPE = new Option<String>("sortType", new SortTypeProcessor(true), 100);
    public static final Option<Boolean> FILTERABLE = new Option<Boolean>("filterable", new FilterableProcessor(), 100);
    public static final Option<Boolean> SEARCHABLE = new Option<Boolean>("searchable", new BooleanProcessor(), 100);
@@ -248,8 +283,8 @@ public final class DatatableOptions {
    public static final Option<FilterType> FILTERTYPE = new Option<FilterType>("filterType", new FilterTypeProcessor(),
          100);
    public static final Option<String> FILTERVALUES = new Option<String>("filterValues", new StringProcessor(true), 100);
-   public static final Option<String> FILTERPLACEHOLDER = new Option<String>("filterPlaceholder",
-         new StringProcessor(), 100);
+   public static final Option<String> FILTERPLACEHOLDER = new Option<String>("filterPlaceholder", new StringProcessor(),
+         100);
    public static final Option<String> RENDERFUNCTION = new Option<String>("renderFunction", new StringProcessor(true),
          100);
    public static final Option<String> SELECTOR = new Option<String>("selector", new StringProcessor(), 100);
@@ -269,41 +304,6 @@ public final class DatatableOptions {
       String normalizedKey = optionName.trim().toLowerCase();
       if (OPTIONS_BY_NAME.containsKey(normalizedKey)) {
          return OPTIONS_BY_NAME.get(normalizedKey);
-      }
-      else if (optionName.contains("export")) {
-         Option<?> option = null;
-
-         Pattern patternExportClass = Pattern.compile(ExportFormatProcessor.REGEX_EXPORT_CLASS,
-               Pattern.CASE_INSENSITIVE);
-         if (patternExportClass.matcher(optionName).find()) {
-            option = EXPORT_CLASS;
-            option.setUserName(optionName);
-            return option;
-         }
-
-         Pattern patternExportFilename = Pattern.compile(ExportFormatProcessor.REGEX_EXPORT_FILENAME,
-               Pattern.CASE_INSENSITIVE);
-         if (patternExportFilename.matcher(optionName).find()) {
-            option = EXPORT_FILENAME;
-            option.setUserName(optionName);
-            return option;
-         }
-
-         Pattern patternExportLabel = Pattern.compile(ExportFormatProcessor.REGEX_EXPORT_LABEL,
-               Pattern.CASE_INSENSITIVE);
-         if (patternExportLabel.matcher(optionName).find()) {
-            option = EXPORT_LABEL;
-            option.setUserName(optionName);
-            return option;
-         }
-
-         Pattern patternExportMimetype = Pattern.compile(ExportFormatProcessor.REGEX_EXPORT_MIMETYPE,
-               Pattern.CASE_INSENSITIVE);
-         if (patternExportMimetype.matcher(optionName).find()) {
-            option = EXPORT_MIMETYPE;
-            option.setUserName(optionName);
-            return option;
-         }
       }
 
       return null;

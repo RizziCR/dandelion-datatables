@@ -36,8 +36,8 @@ import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.processor.IAttributeNameProcessorMatcher;
 
+import com.github.dandelion.core.option.Option;
 import com.github.dandelion.datatables.core.option.DatatableOptions;
-import com.github.dandelion.datatables.core.option.Option;
 import com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect;
 import com.github.dandelion.datatables.thymeleaf.processor.AbstractTableAttrProcessor;
 import com.github.dandelion.datatables.thymeleaf.util.AttributeUtils;
@@ -64,10 +64,10 @@ public class TableFilterDelayAttrProcessor extends AbstractTableAttrProcessor {
 
    @Override
    protected void doProcessAttribute(Arguments arguments, Element element, String attributeName,
-         Map<Option<?>, Object> stagingConf) {
+         Map<Option<?>, Object> stagingOptions) {
 
       BigDecimal attrValue = AttributeUtils.parseAttribute(arguments, element, attributeName, BigDecimal.class);
 
-      stagingConf.put(DatatableOptions.FEATURE_FILTER_DELAY, attrValue.intValue());
+      stagingOptions.put(DatatableOptions.FEATURE_FILTER_DELAY, attrValue.intValue());
    }
 }

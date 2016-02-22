@@ -27,44 +27,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.dandelion.datatables.thymeleaf.processor.attr;
+package com.github.dandelion.datatables.core.option.processor.export;
 
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.thymeleaf.Arguments;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.processor.IAttributeNameProcessorMatcher;
-
-import com.github.dandelion.datatables.core.option.DatatableOptions;
-import com.github.dandelion.datatables.core.option.Option;
-import com.github.dandelion.datatables.thymeleaf.processor.AbstractTableAttrProcessor;
-import com.github.dandelion.datatables.thymeleaf.util.AttributeUtils;
+import com.github.dandelion.core.DandelionException;
+import com.github.dandelion.core.option.OptionProcessingContext;
+import com.github.dandelion.core.util.StringUtils;
+import com.github.dandelion.datatables.core.export.ExportConf;
 
 /**
  * <p>
- * Attribute processor applied to the {@code table} and associated with the
- * {@link DatatableOptions#FEATURE_APPEAR} option.
+ * Processor that configures the label within the {@link ExportConf}
+ * corresponding to the export format.
  * </p>
  * 
  * @author Thibault Duchateau
+ * @since 1.1.0
  */
-public class TableAppearAttrProcessor extends AbstractTableAttrProcessor {
+public class ExportLabelProcessor extends AbstractExportOptionProcessor {
 
-   public TableAppearAttrProcessor(IAttributeNameProcessorMatcher matcher) {
-      super(matcher);
-   }
+   private static Logger logger = LoggerFactory.getLogger(ExportLabelProcessor.class);
 
    @Override
-   public int getPrecedence() {
-      return 8000;
-   }
+   protected Object getProcessedValue(OptionProcessingContext context) {
 
-   @Override
-   protected void doProcessAttribute(Arguments arguments, Element element, String attributeName,
-         Map<Option<?>, Object> stagingConf) {
+      String valueAsString = context.getValueAsString();
 
-      String attrValue = AttributeUtils.parseStringAttribute(arguments, element, attributeName);
+      if (StringUtils.isNotBlank(valueAsString)) {
 
-      stagingConf.put(DatatableOptions.FEATURE_APPEAR, attrValue);
+         // Extract the export format
+         String exportFormat = getExportFormat(context);
+
+         if (StringUtils.isNotBlank(exportFormat)) {
+            logger.debug("Export format found: \"{}\"", exportFormat);
+            ExportConf exportConf = getExportConf(exportFormat, context);
+            exportConf.setLabel(valueAsString);
+         }
+         else {
+            throw new DandelionException("Format " + exportFormat + " unknown");
+         }
+      }
+
+      // The value is not used later during the processing but returned anyway
+      // mainly for logging purpose
+      return valueAsString;
    }
 }

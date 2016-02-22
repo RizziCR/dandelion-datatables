@@ -27,32 +27,49 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.dandelion.datatables.core.option.processor;
+package com.github.dandelion.datatables.core.option.processor.export;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.dandelion.core.DandelionException;
+import com.github.dandelion.core.option.OptionProcessingContext;
 import com.github.dandelion.core.util.StringUtils;
+import com.github.dandelion.datatables.core.export.ExportConf;
 
 /**
  * <p>
- * Processes the option value as a {@link String} but returns {@code null}
- * either if the value is blank or {@code null}.
+ * Processor that configures the export class within the {@link ExportConf}
+ * corresponding to the export format.
  * </p>
  * 
  * @author Thibault Duchateau
- * @since 0.9.0
+ * @since 1.1.0
  */
-public class StringProcessor extends AbstractOptionProcessor {
+public class ExportClassProcessor extends AbstractExportOptionProcessor {
 
-   public StringProcessor() {
-      super();
-   }
-
-   public StringProcessor(boolean bundleAware) {
-      super(bundleAware);
-   }
+   private static Logger logger = LoggerFactory.getLogger(ExportClassProcessor.class);
 
    @Override
    protected Object getProcessedValue(OptionProcessingContext context) {
+
       String valueAsString = context.getValueAsString();
-      return StringUtils.isNotBlank(valueAsString) ? valueAsString : null;
+
+      if (StringUtils.isNotBlank(valueAsString)) {
+
+         // Extract the export format
+         String exportFormat = getExportFormat(context);
+
+         if (StringUtils.isNotBlank(exportFormat)) {
+            logger.debug("Export format found: \"{}\"", exportFormat);
+            ExportConf exportConf = getExportConf(exportFormat, context);
+            exportConf.setExportClass(valueAsString);
+         }
+         else {
+            throw new DandelionException("Format " + exportFormat + " unknown");
+         }
+      }
+
+      return null;
    }
 }

@@ -40,11 +40,12 @@ import org.thymeleaf.dom.Text;
 import org.thymeleaf.processor.IElementNameProcessorMatcher;
 import org.thymeleaf.processor.ProcessorResult;
 
+import com.github.dandelion.core.option.Option;
+import com.github.dandelion.core.util.OptionUtils;
 import com.github.dandelion.datatables.core.extension.Extension;
 import com.github.dandelion.datatables.core.html.HtmlColumn;
 import com.github.dandelion.datatables.core.html.HtmlTable;
-import com.github.dandelion.datatables.core.option.Option;
-import com.github.dandelion.datatables.core.util.ConfigUtils;
+import com.github.dandelion.datatables.core.option.ColumnConfiguration;
 import com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect;
 import com.github.dandelion.datatables.thymeleaf.processor.AbstractElProcessor;
 
@@ -54,26 +55,20 @@ public class ColumnFinalizerProcessor extends AbstractElProcessor {
       super(matcher);
    }
 
-   /**
-    * {@inheritDoc}
-    */
    @Override
    public int getPrecedence() {
       return 8005;
    }
 
-   /**
-    * {@inheritDoc}
-    */
    @Override
    @SuppressWarnings("unchecked")
    protected ProcessorResult doProcessElement(Arguments arguments, Element element, HttpServletRequest request,
          HttpServletResponse response, HtmlTable htmlTable) {
 
-      Map<Option<?>, Object> stagingConf = (Map<Option<?>, Object>) arguments
-            .getLocalVariable(DataTablesDialect.INTERNAL_BEAN_COLUMN_LOCAL_CONF);
-      Map<Option<?>, Extension> stagingExt = (Map<Option<?>, Extension>) arguments
-            .getLocalVariable(DataTablesDialect.INTERNAL_BEAN_COLUMN_LOCAL_EXT);
+      Map<Option<?>, Object> stagingOptions = (Map<Option<?>, Object>) arguments
+            .getLocalVariable(DataTablesDialect.INTERNAL_BEAN_COLUMN_STAGING_OPTIONS);
+      Map<Option<?>, Extension> stagingExtensions = (Map<Option<?>, Extension>) arguments
+            .getLocalVariable(DataTablesDialect.INTERNAL_BEAN_COLUMN_STAGING_EXTENSIONS);
 
       // Get the TH content
       String content = null;
@@ -85,16 +80,18 @@ public class ColumnFinalizerProcessor extends AbstractElProcessor {
       }
 
       // Init a new header column
-      HtmlColumn htmlColumn = new HtmlColumn(true, content);
+      HtmlColumn headerColumn = new HtmlColumn(true, content);
+      request.setAttribute(ColumnConfiguration.class.getCanonicalName(), headerColumn.getColumnConfiguration());
 
-      // Applies the staging configuration against the current column
-      // configuration
-      ConfigUtils.applyStagingOptionsAndExtensions(stagingConf, stagingExt, htmlColumn);
-      ConfigUtils.processOptions(htmlColumn, htmlTable);
+      headerColumn.getColumnConfiguration().getOptions().putAll(stagingOptions);
+      headerColumn.getColumnConfiguration().getStagingExtension().putAll(stagingExtensions);
+
+      // Once all configuration are merged, they can be processed
+      OptionUtils.processOptions(headerColumn.getColumnConfiguration().getOptions(), request);
 
       // Add it to the table
       if (htmlTable != null) {
-         htmlTable.getLastHeaderRow().addHeaderColumn(htmlColumn);
+         htmlTable.getLastHeaderRow().addHeaderColumn(headerColumn);
       }
 
       // Let's clean the TR attributes

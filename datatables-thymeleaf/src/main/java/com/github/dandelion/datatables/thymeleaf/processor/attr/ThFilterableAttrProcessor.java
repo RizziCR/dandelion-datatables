@@ -35,9 +35,9 @@ import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.processor.IAttributeNameProcessorMatcher;
 
+import com.github.dandelion.core.option.Option;
 import com.github.dandelion.datatables.core.extension.Extension;
 import com.github.dandelion.datatables.core.option.DatatableOptions;
-import com.github.dandelion.datatables.core.option.Option;
 import com.github.dandelion.datatables.thymeleaf.dialect.DataTablesDialect;
 import com.github.dandelion.datatables.thymeleaf.extension.feature.FilteringFeature;
 import com.github.dandelion.datatables.thymeleaf.processor.AbstractColumnAttrProcessor;
@@ -64,11 +64,11 @@ public class ThFilterableAttrProcessor extends AbstractColumnAttrProcessor {
 
    @Override
    protected void doProcessAttribute(Arguments arguments, Element element, String attributeName,
-         Map<Option<?>, Object> stagingConf, Map<Option<?>, Extension> stagingExt) {
+         Map<Option<?>, Object> stagingOptions, Map<Option<?>, Extension> stagingExt) {
 
       Boolean attrValue = AttributeUtils.parseBooleanAttribute(arguments, element, attributeName);
 
-      stagingConf.put(DatatableOptions.FILTERABLE, attrValue);
+      stagingOptions.put(DatatableOptions.FILTERABLE, attrValue);
       stagingExt.put(DatatableOptions.FILTERABLE, new FilteringFeature(arguments));
    }
 }

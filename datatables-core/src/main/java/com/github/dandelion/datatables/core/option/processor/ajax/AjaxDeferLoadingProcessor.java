@@ -27,70 +27,49 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.dandelion.datatables.core.processor;
+package com.github.dandelion.datatables.core.option.processor.ajax;
 
-import java.util.Map;
+import java.util.Arrays;
 
-public class MapEntry<K, V> implements Map.Entry<K, V>, Cloneable {
-	K key;
-	V value;
+import com.github.dandelion.core.option.AbstractOptionProcessor;
+import com.github.dandelion.core.option.OptionProcessingContext;
+import com.github.dandelion.core.util.StringUtils;
+import com.github.dandelion.datatables.core.option.DatatableOptions;
 
-	public interface Type<RT, KT, VT> {
-		RT get(MapEntry<KT, VT> entry);
-	}
+/**
+ * <p>
+ * Processor to be applied on the {@link DatatableOptions#AJAX_DEFERLOADING}
+ * option.
+ * </p>
+ * 
+ * @author Thibault Duchateau
+ * @since 1.1.0
+ * @see DatatableOptions#AJAX_DEFERLOADING
+ */
+public class AjaxDeferLoadingProcessor extends AbstractOptionProcessor {
 
-	public MapEntry(K theKey) {
-		key = theKey;
-	}
+   @Override
+   protected Object getProcessedValue(OptionProcessingContext context) {
 
-	public MapEntry(K theKey, V theValue) {
-		key = theKey;
-		value = theValue;
-	}
+      Object retval = null;
+      if (StringUtils.isNotBlank(context.getValueAsString())) {
 
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			return null;
-		}
-	}
+         // Value is an array
+         if (context.getValueAsString().contains(",")) {
+            String[] tmpArray = context.getValueAsString().split(",");
+            final Integer[] intArray = new Integer[tmpArray.length];
+            for (int i = 0; i < tmpArray.length; i++) {
+               intArray[i] = Integer.parseInt(tmpArray[i]);
+            }
+            retval = Arrays.asList(intArray);
+            return retval;
+         }
+         // Value is an int
+         else {
+            retval = Integer.parseInt(context.getValueAsString());
+         }
+      }
 
-	@Override
-	public boolean equals(Object object) {
-		if (this == object) {
-			return true;
-		}
-		if (object instanceof Map.Entry) {
-			Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
-			return (key == null ? entry.getKey() == null : key.equals(entry.getKey()))
-					&& (value == null ? entry.getValue() == null : value.equals(entry.getValue()));
-		}
-		return false;
-	}
-
-	public K getKey() {
-		return key;
-	}
-
-	public V getValue() {
-		return value;
-	}
-
-	@Override
-	public int hashCode() {
-		return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
-	}
-
-	public V setValue(V object) {
-		V result = value;
-		value = object;
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		return key + "=" + value;
-	}
+      return retval;
+   }
 }

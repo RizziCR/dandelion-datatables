@@ -27,30 +27,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.dandelion.datatables.core.option.processor;
+package com.github.dandelion.datatables.core.option.processor.export;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.dandelion.core.DandelionException;
+import com.github.dandelion.core.option.OptionProcessingContext;
 import com.github.dandelion.core.util.StringUtils;
+import com.github.dandelion.datatables.core.export.ExportConf;
 
 /**
- * Processor used for all Integer parameters.
+ * <p>
+ * Processor that configures the file name of within the {@link ExportConf}
+ * corresponding to the export format.
+ * </p>
  * 
  * @author Thibault Duchateau
- * @since 0.9.0
+ * @since 1.1.0
  */
-public class IntegerProcessor extends AbstractOptionProcessor {
+public class ExportFileNameProcessor extends AbstractExportOptionProcessor {
+
+   private static Logger logger = LoggerFactory.getLogger(ExportFileNameProcessor.class);
 
    @Override
    protected Object getProcessedValue(OptionProcessingContext context) {
-      Integer result = null;
+
       String valueAsString = context.getValueAsString();
-      try {
-         result = StringUtils.isNotBlank(valueAsString) ? Integer.parseInt(valueAsString) : null;
-      }
-      catch (NumberFormatException e) {
-         throw new DandelionException("The value '" + valueAsString + "' cannot be parsed to Integer", e);
+
+      if (StringUtils.isNotBlank(valueAsString)) {
+
+         // Extract the export format
+         String exportFormat = getExportFormat(context);
+
+         if (StringUtils.isNotBlank(exportFormat)) {
+            logger.debug("Export format found: \"{}\"", exportFormat);
+            ExportConf exportConf = getExportConf(exportFormat, context);
+            exportConf.setFileName(valueAsString);
+         }
+         else {
+            throw new DandelionException("Format " + exportFormat + " unknown");
+         }
       }
 
-      return result;
+      // The value is not used later during the processing but returned anyway
+      // mainly for logging purpose
+      return valueAsString;
    }
 }

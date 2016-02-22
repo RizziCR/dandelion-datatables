@@ -42,11 +42,11 @@ import org.springframework.mock.web.MockPageContext;
 import org.springframework.mock.web.MockServletContext;
 
 import com.github.dandelion.core.Context;
+import com.github.dandelion.core.option.Option;
+import com.github.dandelion.core.option.OptionProcessor;
 import com.github.dandelion.core.web.WebConstants;
-import com.github.dandelion.datatables.core.option.Option;
 import com.github.dandelion.datatables.core.option.TableConfiguration;
 import com.github.dandelion.datatables.core.option.TableConfigurationFactory;
-import com.github.dandelion.datatables.core.option.processor.OptionProcessor;
 
 public abstract class TableProcessorBaseTest {
 
@@ -64,7 +64,8 @@ public abstract class TableProcessorBaseTest {
 		request = (HttpServletRequest) mockPageContext.getRequest();
 		request.setAttribute(WebConstants.DANDELION_CONTEXT_ATTRIBUTE, new Context(new MockFilterConfig()));
 		confToBeApplied = new HashMap<Option<?>, Object>();
-		tableConfiguration = TableConfigurationFactory.getInstance("fakeId", request, null);
+		tableConfiguration = TableConfigurationFactory.newInstance("fakeId", request, null);
+		request.setAttribute(TableConfiguration.class.getCanonicalName(), tableConfiguration);
 	}
 	
 	@After

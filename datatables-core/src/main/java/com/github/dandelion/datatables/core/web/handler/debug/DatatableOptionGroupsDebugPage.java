@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.dandelion.core.option.Option;
 import com.github.dandelion.core.util.ResourceUtils;
 import com.github.dandelion.core.util.StringUtils;
 import com.github.dandelion.core.web.handler.HandlerContext;
@@ -44,7 +45,6 @@ import com.github.dandelion.core.web.handler.debug.AbstractDebugPage;
 import com.github.dandelion.datatables.core.config.DatatableConfigurator;
 import com.github.dandelion.datatables.core.extension.Extension;
 import com.github.dandelion.datatables.core.option.DatatableOptions;
-import com.github.dandelion.datatables.core.option.Option;
 import com.github.dandelion.datatables.core.option.TableConfigurationFactory;
 
 /**
@@ -73,8 +73,8 @@ public class DatatableOptionGroupsDebugPage extends AbstractDebugPage {
 
    @Override
    public String getTemplate(HandlerContext context) throws IOException {
-      return ResourceUtils.getContentFromInputStream(Thread.currentThread().getContextClassLoader()
-            .getResourceAsStream(PAGE_LOCATION));
+      return ResourceUtils.getContentFromInputStream(
+            Thread.currentThread().getContextClassLoader().getResourceAsStream(PAGE_LOCATION));
    }
 
    @Override
@@ -113,8 +113,6 @@ public class DatatableOptionGroupsDebugPage extends AbstractDebugPage {
       options.add(option(DatatableOptions.CSS_THEMEOPTION, optionsMap));
 
       // Feature-related options
-      options.add(option(DatatableOptions.FEATURE_APPEAR, optionsMap));
-      options.add(option(DatatableOptions.FEATURE_APPEAR_DURATION, optionsMap));
       options.add(option(DatatableOptions.FEATURE_AUTOWIDTH, optionsMap));
       options.add(option(DatatableOptions.FEATURE_DISPLAYLENGTH, optionsMap));
       options.add(option(DatatableOptions.FEATURE_DOM, optionsMap));
@@ -123,7 +121,6 @@ public class DatatableOptionGroupsDebugPage extends AbstractDebugPage {
       options.add(option(DatatableOptions.FEATURE_FILTER_DELAY, optionsMap));
       options.add(option(DatatableOptions.FEATURE_FILTER_PLACEHOLDER, optionsMap));
       options.add(option(DatatableOptions.FEATURE_FILTER_SELECTOR, optionsMap));
-      options.add(option(DatatableOptions.FEATURE_FILTER_TRIGGER, optionsMap));
       options.add(option(DatatableOptions.FEATURE_INFO, optionsMap));
       options.add(option(DatatableOptions.FEATURE_JQUERYUI, optionsMap));
       options.add(option(DatatableOptions.FEATURE_LENGTHCHANGE, optionsMap));
@@ -154,12 +151,28 @@ public class DatatableOptionGroupsDebugPage extends AbstractDebugPage {
 
       // Export-related options
       options.add(option(DatatableOptions.EXPORT_ENABLED_FORMATS, optionsMap));
-      options.add(option(DatatableOptions.EXPORT_CLASS, optionsMap));
       options.add(option(DatatableOptions.EXPORT_CONTAINER_CLASS, optionsMap));
       options.add(option(DatatableOptions.EXPORT_CONTAINER_STYLE, optionsMap));
-      options.add(option(DatatableOptions.EXPORT_FILENAME, optionsMap));
-      options.add(option(DatatableOptions.EXPORT_LABEL, optionsMap));
-      options.add(option(DatatableOptions.EXPORT_MIMETYPE, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_CSV_CLASS, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_CSV_LABEL, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_CSV_FILENAME, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_CSV_MIMETYPE, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XML_CLASS, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XML_LABEL, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XML_FILENAME, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XML_MIMETYPE, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_PDF_CLASS, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_PDF_LABEL, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_PDF_FILENAME, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_PDF_MIMETYPE, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLS_CLASS, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLS_LABEL, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLS_FILENAME, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLS_MIMETYPE, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLSX_CLASS, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLSX_LABEL, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLSX_FILENAME, optionsMap));
+      options.add(option(DatatableOptions.EXPORT_XLSX_MIMETYPE, optionsMap));
 
       // I18n-related options
       options.add(option(DatatableOptions.I18N_MSG_ARIA_SORTASC, optionsMap));

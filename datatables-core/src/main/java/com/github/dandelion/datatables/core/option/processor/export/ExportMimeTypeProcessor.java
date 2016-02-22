@@ -1,6 +1,6 @@
 /*
  * [The "BSD licence"]
- * Copyright (c) 2012 Dandelion
+ * Copyright (c) 2013-2015 Dandelion
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,29 +27,50 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.dandelion.datatables.core.option.processor;
+package com.github.dandelion.datatables.core.option.processor.export;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.dandelion.core.DandelionException;
+import com.github.dandelion.core.option.OptionProcessingContext;
 import com.github.dandelion.core.util.StringUtils;
+import com.github.dandelion.datatables.core.export.ExportConf;
 
 /**
  * <p>
- * Processor used for all Boolean parameters.
+ * Processor that configures the mime type within the {@link ExportConf}
+ * corresponding to the export format.
  * </p>
  * 
  * @author Thibault Duchateau
- * @since 0.10.0
+ * @since 1.1.0
  */
-public class BooleanProcessor extends AbstractOptionProcessor {
+public class ExportMimeTypeProcessor extends AbstractExportOptionProcessor {
+
+   private static Logger logger = LoggerFactory.getLogger(ExportMimeTypeProcessor.class);
 
    @Override
    protected Object getProcessedValue(OptionProcessingContext context) {
 
-      String optionValueAsString = context.getValueAsString();
-      Boolean retval = null;
-      if (StringUtils.isNotBlank(optionValueAsString)) {
-         retval = Boolean.parseBoolean(optionValueAsString);
+      String valueAsString = context.getValueAsString();
+
+      if (StringUtils.isNotBlank(valueAsString)) {
+
+         String exportFormat = getExportFormat(context);
+
+         if (StringUtils.isNotBlank(exportFormat)) {
+            logger.debug("Export format found: \"{}\"", exportFormat);
+            ExportConf exportConf = getExportConf(exportFormat, context);
+            exportConf.setMimeType(valueAsString);
+         }
+         else {
+            throw new DandelionException("Format " + exportFormat + " unknown");
+         }
       }
 
-      return retval;
+      // The value is not used later during the processing but returned anyway
+      // mainly for logging purpose
+      return valueAsString;
    }
 }
